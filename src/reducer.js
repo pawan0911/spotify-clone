@@ -1,9 +1,8 @@
 import axios from 'axios';
 
 export const SET_TOKEN = 'SET_TOKEN';
-export const SET_PLAYLISTS = 'SET_PLAYLISTS';
-export const SET_TRACK_LIST = 'SET_TRACK_LIST';
-export const SET_TRACK = 'SET_TRACK';
+export const SET_USERS = 'SET_USERS';
+export const SET_USER = 'SET_USER';
 
 export function setToken(token) {
  return {
@@ -12,119 +11,54 @@ export function setToken(token) {
  };
 }
 
-export function setPlaylists(playlists) {
+export function setUsers(users) {
  return {
-  type: SET_PLAYLISTS,
-  payload: playlists,
+  type: SET_USERS,
+  payload: users,
  };
 }
 
-export function setTrackList(trackList) {
+export function setUser(user = {}) {
  return {
-  type: SET_TRACK_LIST,
-  payload: trackList,
+  type: SET_USER,
+  payload: user,
  };
 }
 
-export function setTrack(track) {
- return {
-  type: SET_TRACK,
-  payload: track,
- };
-}
-
-export const getPlayLists = () => {
- return (dispatch, getState) => {
-  const token = getState().token;
+export const getUsers = () => {
+ return (dispatch) => {
   return axios({
-   url: `https://api.spotify.com/v1/browse/new-releases?country=IN&offset=0&limit=50`,
+   url: `https://jsonplaceholder.typicode.com/users`,
    headers: {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
    },
    method: 'get',
    responseType: 'json',
   })
    .then((response) => {
-    dispatch(setPlaylists(response.data.albums.items));
-    dispatch(setTrackList({}));
-    dispatch(setTrack({}));
-   })
-   .catch((err) => {
-    if (err.response.status === 401) {
-     dispatch(setToken(''));
-    }
-   });
- };
-};
-
-export const getTrackLists = (id) => {
- return (dispatch, getState) => {
-  const token = getState().token;
-  return axios({
-   url: `https://api.spotify.com/v1/albums/${id}`,
-   headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-   },
-   method: 'get',
-   responseType: 'json',
-  })
-   .then((response) => {
-    dispatch(setPlaylists([]));
-    dispatch(setTrack({}));
-    dispatch(setTrackList(response.data));
-   })
-   .catch((err) => {});
- };
-};
-
-export const getTrack = (id) => {
- return (dispatch, getState) => {
-  const token = getState().token;
-  return axios({
-   url: `https://api.spotify.com/v1/tracks/${id}`,
-   headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`,
-   },
-   method: 'get',
-   responseType: 'json',
-  })
-   .then((response) => {
-    dispatch(setPlaylists([]));
-    dispatch(setTrackList({}));
-    dispatch(setTrack(response.data));
+    dispatch(setUsers(response.data));
    })
    .catch((err) => {});
  };
 };
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default (
- state = { token: '', playlists: [], trackList: {}, track: {} },
- action
-) => {
+export default (state = { token: '', users: [], user: {} }, action) => {
  switch (action.type) {
   case SET_TOKEN:
    return {
     ...state,
     token: action.payload,
    };
-  case SET_PLAYLISTS:
+  case SET_USERS:
    return {
     ...state,
-    playlists: action.payload,
+    users: action.payload,
    };
-  case SET_TRACK_LIST:
+  case SET_USER:
    return {
     ...state,
-    trackList: action.payload,
-   };
-  case SET_TRACK:
-   return {
-    ...state,
-    track: action.payload,
+    user: action.payload,
    };
   default:
    return state;
